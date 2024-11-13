@@ -3,17 +3,17 @@ import {Platform} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {RootStackParamList} from './RootStackParams';
-// import SplashScreen from 'react-native-splash-screen';
 import Auth from './authStack';
 import MyDrawer from './drawer';
-import HomeScreen from 'screens/Main/Home/home';
+import {useAuth} from '../context/AuthContext';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function App() {
+function AppNavigator() {
+  const {user} = useAuth();
+
   useEffect(() => {
     if (Platform.OS === 'android') {
-      // SplashScreen.hide();
       console.log('empieza la app');
     }
   }, []);
@@ -23,14 +23,28 @@ function App() {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-        }}
-        initialRouteName={'Auth'}>
-        <Stack.Screen name="Auth" component={Auth} />
-        <Stack.Screen name="MyDrawer" component={MyDrawer} />
-        <Stack.Screen name="Home" component={HomeScreen} />
+          gestureEnabled: false,
+        }}>
+        {!user ? (
+          <Stack.Screen
+            name="Auth"
+            component={Auth}
+            options={{
+              gestureEnabled: false,
+            }}
+          />
+        ) : (
+          <Stack.Screen
+            name="MyDrawer"
+            component={MyDrawer}
+            options={{
+              gestureEnabled: false,
+            }}
+          />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
-export default App;
+export default AppNavigator;

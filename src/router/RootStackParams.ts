@@ -1,26 +1,43 @@
-// https://benjaminwoojang.medium.com/react-navigation-with-typescript-270dfa8d5cad
-// https://reactnavigation.org/docs/typescript/
-
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {RouteProp} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
 import {propsDataCard} from 'components/tabNav/tabsContainer/allMessages/allMessages';
 
+// Stack principal
 export type RootStackParamList = {
   Auth: undefined;
+  MyDrawer: undefined;
+};
+
+// Stack de autenticación
+export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
   ForgotPassword: undefined;
-  MyDrawer: undefined;
+};
+
+// Stack del drawer
+export type DrawerStackParamList = {
   Home: undefined;
   Profile: undefined;
   DetailsCard: {item: propsDataCard};
   CreateCard: undefined;
 };
 
-export type routerProps<RouteName extends keyof RootStackParamList> = {
-  route: RouteProp<RootStackParamList, RouteName>;
-  navigation: StackNavigationProp<RootStackParamList, RouteName>;
+// Props para las pantallas del Auth Stack
+export type AuthScreenProps<T extends keyof AuthStackParamList> = {
+  navigation: NativeStackNavigationProp<AuthStackParamList, T>;
+  route: RouteProp<AuthStackParamList, T>;
 };
 
-export type navigationProps<RouteName extends keyof RootStackParamList> =
-  StackNavigationProp<RootStackParamList, RouteName>;
+// Props para las pantallas del Drawer
+export type DrawerScreenProps<T extends keyof DrawerStackParamList> = {
+  navigation: DrawerNavigationProp<DrawerStackParamList, T>;
+  route: RouteProp<DrawerStackParamList, T>;
+};
+
+// Props para el Root Stack
+export type RootStackScreenProps<T extends keyof RootStackParamList> = {
+  navigation: NativeStackNavigationProp<RootStackParamList, T>;
+  route: RouteProp<RootStackParamList, T>;
+};

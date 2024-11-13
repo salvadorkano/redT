@@ -1,9 +1,8 @@
-/* eslint-disable react/no-unstable-nested-components */
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import React from 'react';
 import ProfileScreen from 'screens/Main/Profile/profile';
 import CustomDrawerContent from '../screens/Drawer/CustomDrawer';
-import {RootStackParamList} from './RootStackParams';
+import {DrawerStackParamList} from './RootStackParams';
 import {StyleSheet} from 'react-native';
 import HomeScreen from 'screens/Main/Home/home';
 import {colors} from 'colors';
@@ -11,7 +10,8 @@ import {normalize} from 'utils/normalize';
 import DetailsCardScreen from 'screens/Main/DetailsCard/DetailsCard';
 import CreateCardScreen from 'screens/Main/CreateCard/CreateCard';
 
-const Drawer = createDrawerNavigator<RootStackParamList>();
+const Drawer = createDrawerNavigator<DrawerStackParamList>();
+
 function MyDrawer() {
   return (
     <Drawer.Navigator

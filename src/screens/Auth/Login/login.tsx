@@ -9,22 +9,39 @@ import {
   Text,
   TouchableWithoutFeedback,
   View,
+  Alert,
 } from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-import {routerProps} from 'router/RootStackParams';
+import {AuthScreenProps} from 'router/RootStackParams';
 import styles from './loginStyle';
 import InputComponent from 'components/input/CustomInput';
 import ButtonComponent from 'components/button/button';
 import {colors} from 'colors';
 import {normalize} from 'utils/normalize';
 import {reggexEmail} from 'utils/validations';
+import {useAuth} from 'context/AuthContext';
 
-function LoginScreen({navigation}: routerProps<'Login'>) {
+const LoginScreen: React.FC<AuthScreenProps<'Login'>> = ({navigation}) => {
+  const {login} = useAuth();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [validate, setValidate] = useState<boolean>(false);
   const [showError, setShowError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [wifi, setWifi] = useState<string>('no wifi');
+
+  useEffect(() => {
+    console.log('wifi');
+
+    fetch('https://google.com')
+      .then(() => {
+        setWifi('Hay wifi');
+        console.log('Internet works');
+      })
+      .catch(() => {
+        setWifi('No wifi');
+        console.log('No internet');
+      });
+  }, []);
 
   useEffect(() => {
     if (email === '' || password === '') {
@@ -47,17 +64,29 @@ function LoginScreen({navigation}: routerProps<'Login'>) {
     }
   };
 
-  function onLogin() {
-    setLoading(true);
-    // if (email === 'Profe@gmail.com' || email === 'profe@gmail.com') {
-    //   AsyncStorage.setItem('userName', 'Profe');
-    // } else {
-    //   AsyncStorage.setItem('userName', 'user');
-    // }
-    setTimeout(() => {
+  async function onLogin() {
+    console.log('Entra');
+
+    if (!validate || loading) {
+      console.log('Entra validacion');
+
+      return;
+    }
+    try {
+      // const res = await authService.login(email, password);
+      // console.log('res', res);
+
+      console.log('Hola');
+      setLoading(true);
+      await login(email, password);
+    } catch (error) {
+      Alert.alert(
+        'Error de inicio de sesión',
+        error instanceof Error ? error.message : 'Error al iniciar sesión',
+      );
+    } finally {
       setLoading(false);
-      navigation.navigate('MyDrawer');
-    }, 1000);
+    }
   }
 
   return (
@@ -71,7 +100,7 @@ function LoginScreen({navigation}: routerProps<'Login'>) {
             <Image source={logo} />
           </View>
           <View style={styles.containerTitle}>
-            <Text style={styles.principalTitle}>¡Hola!</Text>
+            <Text style={styles.principalTitle}>¡Hola! {wifi}</Text>
             <Text style={styles.secundaryTitle}>
               Ingresa tus datos para iniciar sesión
             </Text>
@@ -104,8 +133,8 @@ function LoginScreen({navigation}: routerProps<'Login'>) {
           <View style={styles.containerButton}>
             <ButtonComponent
               loading={loading}
-              // disabled={!validate}
-              onPress={() => (loading ? null : onLogin())}
+              disabled={!validate}
+              onPress={onLogin}
               styleButton={
                 validate
                   ? {backgroundColor: colors.primary, top: normalize(5)}
@@ -125,6 +154,6 @@ function LoginScreen({navigation}: routerProps<'Login'>) {
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
-}
+};
 
 export default LoginScreen;

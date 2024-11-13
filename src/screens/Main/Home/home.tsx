@@ -3,11 +3,11 @@ import menu from 'icons/iconMenu.png';
 import profilePic from 'images/pp.png';
 import React from 'react';
 import {Image, Pressable, SafeAreaView, Text, View} from 'react-native';
-import {routerProps} from 'router/RootStackParams';
+import {DrawerScreenProps} from 'router/RootStackParams';
 import homeStyle from './homeStyle';
 // import TabNavs from 'components/tabNav/tabNav';
 
-function HomeScreen({navigation}: routerProps<'Home'>) {
+const HomeScreen: React.FC<DrawerScreenProps<'Home'>> = ({navigation}) => {
   return (
     <SafeAreaView style={homeStyle.container}>
       <View style={homeStyle.containerHeader}>
@@ -38,6 +38,6 @@ function HomeScreen({navigation}: routerProps<'Home'>) {
       <View style={homeStyle.containerTabNab}>{/* <TabNavs /> */}</View>
     </SafeAreaView>
   );
-}
+};
 
 export default HomeScreen;
