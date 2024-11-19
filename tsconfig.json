@@ -11,7 +11,6 @@
       "icons": ["./src/assets/icons"],
       "images": ["./src/assets/images"],
       "components": ["./src/components"],
-      "redux": ["./src/redux"],
       "router": ["./src/router"],
       "screens": ["./src/screens"],
       "utils": ["./src/utils"],

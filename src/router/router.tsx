@@ -11,12 +11,12 @@ import HomeScreen from 'screens/Main/Home/home';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App() {
-  useEffect(() => {
-    if (Platform.OS === 'android') {
-      // SplashScreen.hide();
-      console.log('empieza la app');
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (Platform.OS === 'android') {
+  //     // SplashScreen.hide();
+  //     console.log('empieza la app');
+  //   }
+  // }, []);
 
   return (
     <NavigationContainer>
