@@ -1,51 +1,130 @@
-import logo from 'images/LogoTec.png';
 import React, {useState} from 'react';
-import {Image, Pressable, SafeAreaView, Text, View} from 'react-native';
-import {routerProps} from 'router/RootStackParams';
-import styles from './CreateCardStyle';
-import InputComponent from 'components/input/CustomInput';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  Alert,
+  SafeAreaView,
+} from 'react-native';
+import {useSelector} from 'react-redux';
+import {RootState} from 'store';
+import {useAppDispatch} from 'store/hooks';
+import {createMessage} from 'store/slices/messageSlice';
 import {colors} from 'colors';
-import ButtonComponent from 'components/button/button';
+import {Picker} from '@react-native-picker/picker';
 
-function CreateCardScreen({navigation}: routerProps<'CreateCard'>) {
+const CreateMessageScreen = ({navigation}: any) => {
+  const dispatch = useAppDispatch();
+  const {user} = useSelector((state: RootState) => state.auth);
+
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [content, setContent] = useState('');
+  const [type, setType] = useState('Todos');
+
+  const handleCreateMessage = async () => {
+    if (!title || !content) {
+      Alert.alert('Error', 'Por favor completa todos los campos.');
+      return;
+    }
+
+    // Ajustamos la estructura del mensaje para cumplir con la API
+    const message = {
+      title, // El título del mensaje
+      message: content, // El contenido del mensaje
+      createdBy: user?.fullName || 'Anónimo', // El creador del mensaje
+      semester: 10, // Aquí puedes obtenerlo dinámicamente si es necesario
+      career: 'Mecánica', // Aquí puedes obtenerlo dinámicamente si es necesario
+    };
+
+    try {
+      // Dispatch al Redux o llamada al servicio
+      dispatch(createMessage(message));
+      Alert.alert('¡Éxito!', 'Mensaje creado con éxito.', [
+        {text: 'OK', onPress: () => navigation.goBack()},
+      ]);
+    } catch (error) {
+      Alert.alert('Error', 'Hubo un problema al crear el mensaje.');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.containerHeader}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <Text style={styles.textBack}>Regresar</Text>
-        </Pressable>
-        <Text style={styles.textHeader}>Nuevo anuncio</Text>
-        <Image style={styles.imageHeader} resizeMode="contain" source={logo} />
-      </View>
-      <View style={styles.containerForm}>
-        <Text style={styles.textTitle}>Titulo del anuncio</Text>
-        <InputComponent
-          style={styles.inputTitle}
-          placeholder="Titulo del anuncio"
+      <Text style={styles.header}>Crear Nuevo Mensaje</Text>
+      <View style={styles.form}>
+        <TextInput
+          style={styles.input}
+          placeholder="Título del mensaje"
           value={title}
-          onChange={setTitle}
-          placeholderColor={colors.neutral60}
+          onChangeText={setTitle}
         />
-        <InputComponent
-          style={styles.inputDes}
-          placeholder="Escribe tu anuncio"
-          value={description}
-          onChange={setDescription}
-          placeholderColor={colors.neutral60}
-          multi={true}
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          placeholder="Contenido del mensaje"
+          value={content}
+          onChangeText={setContent}
+          multiline
         />
+        <Picker
+          selectedValue={type}
+          onValueChange={itemValue => setType(itemValue)}
+          style={styles.picker}>
+          <Picker.Item label="Todos" value="Todos" />
+          <Picker.Item label="Directos" value="Directos" />
+          <Picker.Item label="Grupal" value="Grupal" />
+        </Picker>
+        <Pressable style={styles.button} onPress={handleCreateMessage}>
+          <Text style={styles.buttonText}>Enviar Mensaje</Text>
+        </Pressable>
       </View>
-      <ButtonComponent
-        onPress={() => navigation.goBack()}
-        styleButton={styles.buttonStyle}
-        buttonText={'Publicar'}
-        styleText={styles.buttonText}
-      />
     </SafeAreaView>
   );
-}
+};
 
-export default CreateCardScreen;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.white,
+    padding: 20,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: colors.titleText,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  form: {
+    flex: 1,
+  },
+  input: {
+    backgroundColor: colors.neutral05,
+    borderRadius: 8,
+    padding: 10,
+    marginVertical: 10,
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: 'top',
+  },
+  picker: {
+    backgroundColor: colors.neutral05,
+    borderRadius: 8,
+    marginVertical: 10,
+  },
+  button: {
+    backgroundColor: colors.primary,
+    borderRadius: 8,
+    padding: 15,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
+
+export default CreateMessageScreen;

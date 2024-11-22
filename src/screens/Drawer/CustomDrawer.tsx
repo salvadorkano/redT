@@ -14,19 +14,23 @@ import {
 } from 'react-native';
 import Animated, {interpolate, useAnimatedStyle} from 'react-native-reanimated';
 import styles from './DrawerStyle';
+import {useDispatch} from 'react-redux';
+import {logout} from 'store/slices/authSlice';
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const {navigation} = props;
+  const dispatch = useDispatch();
   const scrollRef = useRef<Animated.ScrollView>(null);
 
-  const logOut = () => {
+  const handleLogout = () => {
+    dispatch(logout());
     navigation.navigate('Auth');
   };
 
   const drawerProgress = useDrawerProgress();
 
   const viewStyles = useAnimatedStyle(() => {
-    const translateX = interpolate(drawerProgress.value, [0, 1], [300, 0]);
+    const translateX = interpolate(drawerProgress.value || 0, [0, 1], [300, 0]);
     return {
       transform: [{translateX}],
     };
@@ -34,16 +38,18 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Encabezado del Drawer */}
       <Animated.View
         style={[styles.row, styles.view, styles.marginTop, viewStyles]}>
         <Text style={styles.headerTitle}>¡Hola!</Text>
       </Animated.View>
+
+      {/* Opciones de navegación */}
       <Animated.ScrollView
         ref={scrollRef}
         {...props}
         showsVerticalScrollIndicator={false}
         style={[styles.marginVertical, viewStyles]}>
-        {/* <DrawerItemList {...props} /> */}
         <Animated.View style={[styles.view, styles.marginTop, viewStyles]}>
           <Pressable
             onPress={() => navigation.navigate('Profile')}
@@ -57,7 +63,9 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
           </Pressable>
         </Animated.View>
       </Animated.ScrollView>
-      <TouchableOpacity onPress={logOut}>
+
+      {/* Botón de logout */}
+      <TouchableOpacity onPress={handleLogout}>
         <Animated.View
           style={[styles.row, styles.view, styles.marginBottom, viewStyles]}>
           <Text style={styles.textDrawer}>Cerrar sesión</Text>

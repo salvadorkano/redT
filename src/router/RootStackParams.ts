@@ -15,6 +15,8 @@ export type RootStackParamList = {
   Profile: undefined;
   DetailsCard: {item: propsDataCard};
   CreateCard: undefined;
+  SelectMessageType: undefined;
+  CreateMessage: undefined;
 };
 
 export type routerProps<RouteName extends keyof RootStackParamList> = {

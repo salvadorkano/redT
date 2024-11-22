@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+  Alert,
   Image,
   Keyboard,
   KeyboardAvoidingView,
@@ -9,8 +10,8 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {useAppDispatch, useAppSelector} from '../../../store/hooks'; // Custom hooks
-import {login} from 'store/slices/authSlice'; // Redux slice
+import {useAppDispatch, useAppSelector} from '../../../store/hooks';
+import {login} from 'store/slices/authSlice';
 import {routerProps} from 'router/RootStackParams';
 import styles from './loginStyle';
 import InputComponent from 'components/input/CustomInput';
@@ -22,10 +23,9 @@ import logo from 'images/LogoTec.png';
 
 function LoginScreen({navigation}: routerProps<'Login'>) {
   const dispatch = useAppDispatch();
-  const {loading, error, user} = useAppSelector(state => state.auth); // State from Redux
-
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const {isLoading, error, user} = useAppSelector(state => state.auth);
+  const [email, setEmail] = useState<string>('k+105@gmail.com');
+  const [password, setPassword] = useState<string>('Contra');
   const [validate, setValidate] = useState<boolean>(false);
   const [showError, setShowError] = useState<boolean>(false);
 
@@ -42,6 +42,15 @@ function LoginScreen({navigation}: routerProps<'Login'>) {
       navigation.replace('MyDrawer');
     }
   }, [navigation, user]);
+
+  // Mostrar alert si hay error
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Error de inicio de sesión', error, [
+        {text: 'Aceptar', style: 'default'},
+      ]);
+    }
+  }, [error]);
 
   const validateEmail = (textEmail: string) => {
     const string = textEmail.trim();
@@ -103,12 +112,11 @@ function LoginScreen({navigation}: routerProps<'Login'>) {
             <Pressable onPress={() => navigation.navigate('ForgotPassword')}>
               <Text style={styles.styleForgotPassword}>Olvidé contraseña</Text>
             </Pressable>
-            {error && <Text style={styles.styleError}>{error}</Text>}
           </View>
           <View style={styles.containerButton}>
             <ButtonComponent
-              loading={loading}
-              disabled={!validate || loading}
+              loading={isLoading}
+              disabled={!validate || isLoading}
               onPress={onLogin}
               styleButton={
                 validate

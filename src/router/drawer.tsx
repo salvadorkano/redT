@@ -10,23 +10,28 @@ import {colors} from 'colors';
 import {normalize} from 'utils/normalize';
 import DetailsCardScreen from 'screens/Main/DetailsCard/DetailsCard';
 import CreateCardScreen from 'screens/Main/CreateCard/CreateCard';
+import SelectMessageTypeScreen from 'screens/Message/SelectMessageType/SelectMessageTypeScreen';
+import CreateMessageScreen from 'screens/Message/CreateMessage/CreateMessageScreen';
 
 const Drawer = createDrawerNavigator<RootStackParamList>();
 function MyDrawer() {
   return (
     <Drawer.Navigator
-      useLegacyImplementation={false}
       screenOptions={{
         drawerPosition: 'right',
         headerShown: false,
         drawerStyle: styles.drawerStyles,
-        sceneContainerStyle: styles.contentStyle,
       }}
       drawerContent={props => <CustomDrawerContent {...props} />}>
       <Drawer.Screen name="Home" component={HomeScreen} />
       <Drawer.Screen name="Profile" component={ProfileScreen} />
       <Drawer.Screen name="DetailsCard" component={DetailsCardScreen} />
       <Drawer.Screen name="CreateCard" component={CreateCardScreen} />
+      <Drawer.Screen
+        name="SelectMessageType"
+        component={SelectMessageTypeScreen}
+      />
+      <Drawer.Screen name="CreateMessage" component={CreateMessageScreen} />
     </Drawer.Navigator>
   );
 }

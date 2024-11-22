@@ -7,16 +7,20 @@ import {RootStackParamList} from './RootStackParams';
 import Auth from './authStack';
 import MyDrawer from './drawer';
 import HomeScreen from 'screens/Main/Home/home';
+import {useSelector} from 'react-redux';
+import {RootState} from '../store';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App() {
-  // useEffect(() => {
-  //   if (Platform.OS === 'android') {
-  //     // SplashScreen.hide();
-  //     console.log('empieza la app');
-  //   }
-  // }, []);
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      // SplashScreen.hide();
+      console.log('empieza la app');
+    }
+  }, []);
 
   return (
     <NavigationContainer>
@@ -24,7 +28,7 @@ function App() {
         screenOptions={{
           headerShown: false,
         }}
-        initialRouteName={'Auth'}>
+        initialRouteName={isLoggedIn ? 'MyDrawer' : 'Auth'}>
         <Stack.Screen name="Auth" component={Auth} />
         <Stack.Screen name="MyDrawer" component={MyDrawer} />
         <Stack.Screen name="Home" component={HomeScreen} />
