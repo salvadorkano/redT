@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {
-  FlatList,
   Image,
   Pressable,
   SafeAreaView,
@@ -13,41 +12,43 @@ import {useSelector} from 'react-redux';
 import {RootState} from 'store';
 import styles from './homeStyle';
 import menuIcon from 'icons/iconMenu.png';
-import searchIcon from 'icons/user.png';
-import profilePic from 'images/pp.png';
+import searchIcon from 'icons/search.png';
 import TabBar from './TabBar';
 import {useAppDispatch, useAppSelector} from 'store/hooks';
 import {fetchMessages} from 'store/slices/messageSlice';
+import MessageList from './MessageList/MessageList';
 
 const HomeScreen = ({navigation}: any) => {
   const {user} = useSelector((state: RootState) => state.auth);
-  const {messages, isLoading, error} = useAppSelector(state => state.messages);
+  const {messages, isLoading} = useAppSelector(state => state.message);
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState(0);
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
-    // Obtener mensajes al cargar la pantalla
-    dispatch(fetchMessages());
-  }, [dispatch]);
+    if (user?.id) {
+      dispatch(fetchMessages(user.id));
+    }
+  }, [dispatch, user?.id]);
 
-  const filteredMessages =
-    activeTab === 0
-      ? messages
-      : messages.filter(
-          msg => msg.career === ['Todos', 'Directos', 'Grupal'][activeTab],
-        );
+  const getFilteredMessages = () => {
+    const tabFilter = ['Todos', 'Directos', 'Grupal'][activeTab];
 
-  const renderMessage = ({item}: any) => (
-    <View style={styles.messageContainer}>
-      <Image source={profilePic} style={styles.avatar} />
-      <View style={styles.messageContent}>
-        <Text style={styles.sender}>{item.createdBy}</Text>
-        <Text style={styles.time}>{item.time || 'Sin hora'}</Text>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.description}>{item.message}</Text>
-      </View>
-    </View>
-  );
+    return messages.filter(msg => {
+      const matchesType =
+        activeTab === 0 || // Todos los mensajes para la pestaña "Todos"
+        msg.type === tabFilter;
+
+      const matchesSearch =
+        !searchText ||
+        msg.title.toLowerCase().includes(searchText.toLowerCase()) ||
+        msg.message.toLowerCase().includes(searchText.toLowerCase());
+
+      return matchesType && matchesSearch;
+    });
+  };
+
+  const filteredMessages = getFilteredMessages();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -59,7 +60,7 @@ const HomeScreen = ({navigation}: any) => {
         <Pressable
           style={styles.menuButton}
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
-          <Image source={menuIcon} style={styles.menuIcon} />
+          <Image source={menuIcon} />
         </Pressable>
       </View>
 
@@ -69,6 +70,8 @@ const HomeScreen = ({navigation}: any) => {
           placeholder="Buscar mensaje"
           style={styles.searchInput}
           placeholderTextColor="#A1A1A1"
+          value={searchText}
+          onChangeText={setSearchText}
         />
         <Image source={searchIcon} style={styles.searchIcon} />
       </View>
@@ -82,12 +85,7 @@ const HomeScreen = ({navigation}: any) => {
           <Text style={styles.loadingText}>Cargando mensajes...</Text>
         </View>
       ) : filteredMessages.length > 0 ? (
-        <FlatList
-          data={filteredMessages}
-          renderItem={renderMessage}
-          keyExtractor={item => item.id.toString()}
-          style={styles.messagesList}
-        />
+        <MessageList messages={filteredMessages} isLoading={isLoading} />
       ) : (
         <View style={styles.noMessagesContainer}>
           <Text style={styles.noMessagesText}>No hay mensajes disponibles</Text>

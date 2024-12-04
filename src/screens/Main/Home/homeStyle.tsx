@@ -1,57 +1,17 @@
 import {colors} from 'colors';
 import {StyleSheet} from 'react-native';
-import {normalize} from 'utils/normalize';
 
 export default StyleSheet.create({
-  containerHeader: {
+  // Layout
+  container: {
     flex: 1,
-    backgroundColor: colors.white,
-    flexDirection: 'row',
-    marginHorizontal: normalize(20),
-    marginVertical: normalize(20),
-  },
-  viewImage: {
-    flex: 0.2,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  viewText: {
-    flex: 1,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    paddingLeft: normalize(10),
-  },
-  viewMenu: {
-    flex: 0.2,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    paddingLeft: normalize(10),
-  },
-  textFormat: {
-    color: colors.titleText,
-    fontSize: normalize(16),
-    fontStyle: 'normal',
-    fontWeight: 'bold',
-    lineHeight: 28,
-  },
-  containerSearch: {
-    flex: 1,
-    justifyContent: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: normalize(20),
+    backgroundColor: '#FFF',
   },
   containerTabNab: {
     flex: 10,
   },
 
-  container: {
-    flex: 1,
-    backgroundColor: '#FFF',
-  },
+  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -67,10 +27,8 @@ export default StyleSheet.create({
   menuButton: {
     padding: 8,
   },
-  menuIcon: {
-    width: 24,
-    height: 24,
-  },
+
+  // Search
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -91,6 +49,8 @@ export default StyleSheet.create({
     width: 20,
     height: 20,
   },
+
+  // Tabs
   tabContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -111,6 +71,15 @@ export default StyleSheet.create({
   activeTabText: {
     color: colors.primary,
   },
+  tabIndicator: {
+    position: 'absolute',
+    bottom: 0,
+    height: 3,
+    backgroundColor: colors.primary,
+    borderRadius: 2,
+  },
+
+  // Messages
   messagesList: {
     flex: 1,
     paddingHorizontal: 16,
@@ -156,6 +125,14 @@ export default StyleSheet.create({
     color: '#555',
     marginTop: 2,
   },
+  details: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
+    fontStyle: 'italic',
+  },
+
+  // New Message Button
   newMessageButton: {
     backgroundColor: colors.primary,
     margin: 16,
@@ -168,13 +145,8 @@ export default StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  tabIndicator: {
-    position: 'absolute',
-    bottom: 0,
-    height: 3,
-    backgroundColor: colors.primary,
-    borderRadius: 2,
-  },
+
+  // States
   noMessagesContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -182,10 +154,9 @@ export default StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 10,
   },
-
   noMessagesText: {
     fontSize: 16,
-    color: '#A1A1A1', // Un color neutro para el texto.
+    color: '#A1A1A1',
     textAlign: 'center',
     fontWeight: '500',
   },
@@ -198,4 +169,6 @@ export default StyleSheet.create({
     fontSize: 16,
     color: colors.neutral60,
   },
+
+  // Removed unused styles
 });

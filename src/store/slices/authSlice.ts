@@ -6,6 +6,7 @@ interface User {
   email: string;
   username: string;
   role: 'ESTUDIANTE' | 'MAESTRO';
+  id: string;
 }
 interface AuthState {
   user: User | null;
@@ -51,7 +52,6 @@ export const login = createAsyncThunk(
   ) => {
     try {
       const data = await loginUser(credentials);
-      console.log('data', data);
       if (data.data.success) {
         return data.data.data; // Este es el payload de la acción fulfilled
       } else {

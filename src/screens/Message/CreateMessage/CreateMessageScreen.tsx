@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -7,23 +7,90 @@ import {
   Pressable,
   SafeAreaView,
   Alert,
+  FlatList,
 } from 'react-native';
 import {colors} from 'colors';
 import {Picker} from '@react-native-picker/picker';
 import {useAppDispatch, useAppSelector} from 'store/hooks';
 import {createMessage} from 'store/slices/messageSlice';
+import {
+  fetchTeacherGroups,
+  searchStudentsByUsername,
+} from '../../../services/courses';
+
+type MessageType = 'Todos' | 'Directos' | 'Grupal';
+
+type TeacherGroup = {
+  _id: string;
+  name: string;
+  teacherId: string;
+  semester: number;
+  career: string;
+  code: string;
+};
 
 const CreateMessageScreen = ({route, navigation}: any) => {
-  const {type} = route.params; // Obtenemos el tipo de mensaje (Individual o Grupal)
+  const {type}: {type: MessageType} = route.params; // Tipo de mensaje
   const {user} = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
   const [to, setTo] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [typeMessage, setTypeMessage] = useState('Todos');
+  const [searchQuery, setSearchQuery] = useState(''); // Para buscar alumnos
+  const [searchResults, setSearchResults] = useState([]); // Resultados de búsqueda de alumnos
+  const [teacherGroups, setTeacherGroups] = useState<TeacherGroup[]>([]);
+  const [loading, setLoading] = useState(false); // Estado de carga
+
+  // Función para buscar alumnos
+  const fetchStudents = useCallback(async (query: string) => {
+    try {
+      console.log('Buscar alumno');
+
+      setLoading(true);
+      const results = await searchStudentsByUsername(query);
+      console.log('result', results);
+
+      setSearchResults(results || []);
+    } catch (error) {
+      console.error('Error buscando alumnos:', error);
+      Alert.alert('Error', 'No se pudo buscar a los alumnos.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Función para obtener los grupos del maestro
+  const loadTeacherGroups = useCallback(async () => {
+    try {
+      setLoading(true);
+      if (user?.id) {
+        const groups = await fetchTeacherGroups(user.id);
+        console.log('groups', groups);
+
+        setTeacherGroups(groups || []);
+      }
+    } catch (error) {
+      console.error('Error obteniendo grupos:', error);
+      Alert.alert('Error', 'No se pudieron cargar los grupos.');
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.id]);
+
+  // Ejecutar lógica de carga de datos
+  useEffect(() => {
+    setTypeMessage(type);
+    if (type === 'Grupal') {
+      loadTeacherGroups();
+    }
+  }, [type, loadTeacherGroups]);
 
   const handleSendMessage = async () => {
-    // Validación de campos
+    console.log('to', to);
+    console.log('subject', subject);
+    console.log('message', message);
+
     if (!to || !subject || !message) {
       Alert.alert('Error', 'Por favor completa todos los campos.');
       return;
@@ -32,13 +99,13 @@ const CreateMessageScreen = ({route, navigation}: any) => {
     const newMessage = {
       title: subject,
       message,
-      createdBy: user?.username || 'Desconocido',
-      semester: type === 'Individual' ? parseInt(to) : 0, // Simula semestre o destinatario
-      career: typeMessage, // Para mensajes grupales
+      createdBy: user?.id || 'Desconocido',
+      type: typeMessage as MessageType, // Asegura que el tipo sea válido
+      ...(type === 'Directos' && {recipient: to}),
+      ...(type === 'Grupal' && {courseId: to}),
     };
 
     try {
-      // Llamada al Redux para crear el mensaje
       await dispatch(createMessage(newMessage)).unwrap();
       Alert.alert('Mensaje Enviado', 'Tu mensaje se ha enviado con éxito.', [
         {text: 'OK', onPress: () => navigation.goBack()},
@@ -48,35 +115,57 @@ const CreateMessageScreen = ({route, navigation}: any) => {
     }
   };
 
+  const renderSearchResults = ({item}: any) => (
+    <Pressable style={styles.searchResult} onPress={() => setTo(item._id)}>
+      <Text>
+        {item.username} - {item.fullName}
+      </Text>
+    </Pressable>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
+      <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>Regresar</Text>
+      </Pressable>
+
+      {/* Encabezado */}
       <View style={styles.headerContainer}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <Text style={styles.backText}>Regresar</Text>
-        </Pressable>
         <Text style={styles.header}>Nuevo mensaje</Text>
       </View>
 
       <View style={styles.form}>
         {/* Campo "Para" */}
         <Text style={styles.label}>Para:</Text>
-        {type === 'Individual' ? (
-          <TextInput
-            style={styles.input}
-            placeholder={
-              type === 'Individual' ? 'Nombre del Alumno' : 'Selecciona grupo'
-            }
-            value={to}
-            onChangeText={setTo}
-          />
+        {type === 'Directos' ? (
+          <>
+            <TextInput
+              style={styles.input}
+              placeholder="Buscar alumno (e.g. 18010406)"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              onSubmitEditing={() => fetchStudents(searchQuery)}
+            />
+            {loading && <Text style={styles.loadingText}>Buscando...</Text>}
+            <FlatList
+              data={searchResults}
+              renderItem={renderSearchResults}
+              keyExtractor={(item, index) => `${item} + ${index}`}
+              style={styles.searchList}
+            />
+          </>
         ) : (
           <Picker
-            selectedValue={typeMessage}
-            onValueChange={itemValue => setTypeMessage(itemValue)}
+            selectedValue={to}
+            onValueChange={itemValue => setTo(itemValue)}
             style={styles.picker}>
-            <Picker.Item label="Todos" value="Todos" />
-            <Picker.Item label="Directos" value="Directos" />
-            <Picker.Item label="Grupal" value="Grupal" />
+            {teacherGroups.map((group: TeacherGroup) => (
+              <Picker.Item
+                key={group._id}
+                label={`${group.name} - Semestre ${group.semester}`}
+                value={group._id}
+              />
+            ))}
           </Picker>
         )}
 
@@ -167,6 +256,29 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral05,
     borderRadius: 8,
     marginVertical: 10,
+  },
+  searchResult: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.primary,
+    backgroundColor: 'red',
+  },
+  searchList: {
+    maxHeight: 80,
+  },
+  loadingText: {
+    textAlign: 'center',
+    color: colors.subTitle,
+  },
+
+  backButton: {
+    marginTop: 20,
+    marginLeft: 10,
+  },
+  subHeader: {
+    fontSize: 18,
+    color: colors.subTitle,
+    textAlign: 'center',
   },
 });
 

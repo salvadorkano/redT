@@ -1,13 +1,15 @@
 import {createSlice, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
-import {createNotice, getNotices} from 'services/noticeService';
+import {createNotice, getUserNotices} from 'services/noticeService';
 
-interface Message {
-  id: number;
+export interface Message {
+  id: number; // En el backend es string
   title: string;
   message: string;
   createdBy: string;
-  semester: number;
-  career: string;
+  type: 'Todos' | 'Directos' | 'Grupal';
+  recipient?: string;
+  courseId?: string;
+  createdAt: Date;
 }
 
 interface MessageState {
@@ -22,12 +24,21 @@ const initialState: MessageState = {
   error: null,
 };
 
+interface CreateMessagePayload {
+  title: string;
+  message: string;
+  createdBy: string;
+  type: 'Todos' | 'Directos' | 'Grupal';
+  recipient?: string;
+  courseId?: string;
+}
+
 // Thunk para obtener mensajes
 export const fetchMessages = createAsyncThunk(
   'messages/fetchMessages',
-  async (_, {rejectWithValue}) => {
+  async (userId: string, {rejectWithValue}) => {
     try {
-      const response = await getNotices();
+      const response = await getUserNotices(userId); // Consulta basada en usuario
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
@@ -40,18 +51,20 @@ export const fetchMessages = createAsyncThunk(
 // Thunk para crear mensaje
 export const createMessage = createAsyncThunk(
   'messages/createMessage',
-  async (
-    message: {
-      title: string;
-      message: string;
-      createdBy: string;
-      semester: number;
-      career: string;
-    },
-    {rejectWithValue},
-  ) => {
+  async (message: CreateMessagePayload, {rejectWithValue}) => {
     try {
-      const response = await createNotice(message);
+      const messageToCreate = {
+        title: message.title,
+        message: message.message,
+        createdBy: message.createdBy,
+        type: message.type,
+        ...(message.recipient && {recipient: message.recipient}),
+        ...(message.courseId && {courseId: message.courseId}),
+      };
+
+      console.log('en el slice', messageToCreate);
+
+      const response = await createNotice(messageToCreate);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Error al crear mensaje');
@@ -78,7 +91,7 @@ const messageSlice = createSlice({
         fetchMessages.fulfilled,
         (state, action: PayloadAction<Message[]>) => {
           state.isLoading = false;
-          state.messages = action.payload;
+          state.messages = action.payload.filter(msg => msg.type); // Validación básica
         },
       )
       .addCase(fetchMessages.rejected, (state, action: PayloadAction<any>) => {

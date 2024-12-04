@@ -1,20 +1,37 @@
 import React from 'react';
-import {View, Text, StyleSheet, Pressable, SafeAreaView} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  SafeAreaView,
+  Image,
+} from 'react-native';
 import {colors} from 'colors';
-import IconIndividual from 'icons/door.png'; // Asegúrate de incluir este ícono
-import IconGrupal from 'icons/user.png'; // Asegúrate de incluir este ícono
-import {Image} from 'react-native';
+import IconIndividual from 'icons/user_blue.png'; // Ícono para Individual
+import IconGrupal from 'icons/grup_blue.png'; // Ícono para Grupal
+import {normalize} from 'utils/normalize';
 
 const SelectMessageTypeScreen = ({navigation}: any) => {
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Nuevo mensaje</Text>
-      <Text style={styles.subHeader}>Selecciona el tipo de mensaje</Text>
+      {/* Botón de Regresar */}
+      <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>Regresar</Text>
+      </Pressable>
+
+      {/* Encabezado */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>Nuevo mensaje</Text>
+        <Text style={styles.subHeader}>Selecciona el tipo de mensaje</Text>
+      </View>
+
+      {/* Botones de selección */}
       <View style={styles.buttonContainer}>
         <Pressable
           style={styles.card}
           onPress={() =>
-            navigation.navigate('CreateMessage', {type: 'Individual'})
+            navigation.navigate('CreateMessage', {type: 'Directos'})
           }>
           <Image source={IconIndividual} style={styles.icon} />
           <Text style={styles.cardText}>Individual</Text>
@@ -37,8 +54,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
     paddingHorizontal: 20,
-    justifyContent: 'center',
+  },
+  backButton: {
+    marginTop: 20,
+    marginLeft: 10,
+  },
+  backText: {
+    color: colors.primary,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  headerContainer: {
     alignItems: 'center',
+    marginTop: 30,
+    marginBottom: 40,
   },
   header: {
     fontSize: 24,
@@ -49,13 +78,14 @@ const styles = StyleSheet.create({
   subHeader: {
     fontSize: 18,
     color: colors.subTitle,
-    marginBottom: 40,
     textAlign: 'center',
   },
   buttonContainer: {
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
+    alignItems: 'center',
+    marginHorizontal: 10,
   },
   card: {
     flex: 1,
@@ -69,6 +99,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3,
     elevation: 4,
+    borderColor: colors.primary,
+    borderWidth: 1,
+    marginBottom: normalize(120),
   },
   cardText: {
     fontSize: 16,

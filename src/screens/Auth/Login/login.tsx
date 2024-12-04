@@ -24,8 +24,8 @@ import logo from 'images/LogoTec.png';
 function LoginScreen({navigation}: routerProps<'Login'>) {
   const dispatch = useAppDispatch();
   const {isLoading, error, user} = useAppSelector(state => state.auth);
-  const [email, setEmail] = useState<string>('k+105@gmail.com');
-  const [password, setPassword] = useState<string>('Contra');
+  const [email, setEmail] = useState<string>('18010407');
+  const [password, setPassword] = useState<string>('Contra12');
   const [validate, setValidate] = useState<boolean>(false);
   const [showError, setShowError] = useState<boolean>(false);
 
@@ -66,9 +66,9 @@ function LoginScreen({navigation}: routerProps<'Login'>) {
   };
 
   const onLogin = async () => {
-    if (!validate) {
-      return;
-    }
+    // if (!validate) {
+    //   return;
+    // }
     dispatch(login({username: email, password}));
   };
 
@@ -116,7 +116,7 @@ function LoginScreen({navigation}: routerProps<'Login'>) {
           <View style={styles.containerButton}>
             <ButtonComponent
               loading={isLoading}
-              disabled={!validate || isLoading}
+              // disabled={!validate || isLoading}
               onPress={onLogin}
               styleButton={
                 validate

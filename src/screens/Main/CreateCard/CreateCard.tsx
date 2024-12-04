@@ -51,7 +51,7 @@ const CreateMessageScreen = ({navigation}: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Crear Nuevo Mensaje</Text>
+      <Text style={styles.header}>Crear Nuevo Mensaje222</Text>
       <View style={styles.form}>
         <TextInput
           style={styles.input}
