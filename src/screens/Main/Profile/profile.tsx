@@ -12,8 +12,11 @@ import {
 } from 'react-native';
 import {routerProps} from 'router/RootStackParams';
 import styles from './profileStyle';
+import {useAppSelector} from 'store/hooks';
 
 function ProfileScreen({navigation}: routerProps<'Profile'>) {
+  const {user} = useAppSelector(state => state.auth);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.containerHeader}>
@@ -27,10 +30,10 @@ function ProfileScreen({navigation}: routerProps<'Profile'>) {
           <Image source={ProfileP} style={styles.imgProfile} />
         </ImageBackground>
         <View style={styles.textContainer}>
-          <Text style={styles.name}>Fernando Reyes Gonzalez</Text>
-          <Text style={styles.textInfo}>No. Control: 1506242</Text>
-          <Text style={styles.textInfo}>Andres_22@gmail.com</Text>
-          <Text style={styles.textInfo}>222-222-2222</Text>
+          <Text style={styles.name}>{user?.fullName}</Text>
+          <Text style={styles.textInfo}>No. Control: {user?.username}</Text>
+          <Text style={styles.textInfo}>{user?.email}</Text>
+          <Text style={styles.textInfo}>{user?.role}</Text>
           {/* <Text style={styles.editInfoText}>Editar información</Text> */}
         </View>
       </View>
