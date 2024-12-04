@@ -24,16 +24,17 @@ import logo from 'images/LogoTec.png';
 function LoginScreen({navigation}: routerProps<'Login'>) {
   const dispatch = useAppDispatch();
   const {isLoading, error, user} = useAppSelector(state => state.auth);
-  const [email, setEmail] = useState<string>('18010407');
-  const [password, setPassword] = useState<string>('Contra12');
-  const [validate, setValidate] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [validate, setValidate] = useState<boolean>(true);
   const [showError, setShowError] = useState<boolean>(false);
 
   useEffect(() => {
     if (email === '' || password === '') {
       setValidate(false);
     } else {
-      validateEmail(email);
+      // validateEmail(email);
+      setValidate(true);
     }
   }, [email, password]);
 
@@ -92,7 +93,7 @@ function LoginScreen({navigation}: routerProps<'Login'>) {
             <InputComponent
               value={email}
               placeholder="Correo electrónico"
-              onChange={value => validateEmail(value)}
+              onChange={value => setEmail(value)}
               style={styles.inputEmail}
               placeholderColor={colors.neutral60}
             />
